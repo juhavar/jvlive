@@ -141,9 +141,7 @@ return (
         variant="outlined" elevation={3} >
         <div><img src={logo} className="App-logo" alt="logo" /></div>
         <div className="form-item">
-
           <TextField
-
             name="etunimi"
             onBlur={(e) => updateForm(e)}
             style={{ width: '75%' }}
