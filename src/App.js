@@ -17,8 +17,6 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 //import{ EmailJSResponseStatus, init } from 'emailjs-com';
 import emailjs from 'emailjs-com';
 
-
-
 function App() {
   const [formData, setFormData] = useState([
     { etunimi: { text: '', error: true } },
@@ -60,9 +58,7 @@ function App() {
   const updateForm = (e) => {
     setHasStarted(true)
     let deepCopy = JSON.parse(JSON.stringify(formData))
-    console.log("e.target.name", e.target.name)
-    console.log("e.target.id", e.target.id)
-    console.log("formData", formData[e.target.name.toString()])
+
     if (e.target.value === "") {
       console.log("virhe!")
       deepCopy[e.target.id].[e.target.name].error = true
@@ -73,7 +69,7 @@ function App() {
       console.log("deepCopy: ", deepCopy)
       deepCopy[e.target.id].[e.target.name].text = e.target.value
       deepCopy[e.target.id].[e.target.name].error = false
-      console.log(deepCopy)
+ 
       setFormData(deepCopy)
       //setFormData(formData[e.target.name]: e.target.value)
       // setFormData([e.target.name].error = false)
