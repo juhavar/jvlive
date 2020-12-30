@@ -1,5 +1,5 @@
 import logo from './logo.svg';
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import './App.css';
 //import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -16,7 +16,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 //import{ EmailJSResponseStatus, init } from 'emailjs-com';
 import emailjs from 'emailjs-com';
-import ReCAPTCHA from "react-google-recaptcha";;
+//import ReCAPTCHA from "react-google-recaptcha";;
+
 
 function App() {
   const [formData, setFormData] = useState([
@@ -33,13 +34,12 @@ function App() {
 
   const [errorCheck, setErrorCheck] = useState(false)
   const [hasStarted, setHasStarted] = useState(false)
-  const [capValue, setCapValue] = useState()
-
+  const btnRef = useRef()
 
   const statusOptions = [
     { title: 'Student ' },
     { title: 'Unemployed ' },
-    { title: 'Entrepreneur '},
+    { title: 'Entrepreneur ' },
     { title: 'Employed, part-time ' },
     { title: 'Employed, full-time ' },
     { title: 'In military service, until: ' },
@@ -104,29 +104,32 @@ function App() {
 
 
 
-  const handleSubmit = () => {
+  const handleSubmit = e => {
 
-    var template_params= {
-        'etunimi': formData[0]["etunimi"].text,
-        'sukunimi': formData[1]["sukunimi"].text,
-        'email': formData[2]["email"].text,
-        'kaupunki': formData[3]["kaupunki"].text,
-        'sAika': formData[4]["sAika"].text,
-        'joukkueet': formData[5]["joukkueet"].text,
-        'status': formData[6]["status"].text,
-        'liikkuminen': formData[7]["liikkuminen"].text,
-        'hakemusteksti': formData[8]["hakemusteksti"].text
-      }
- 
+    if(btnRef.current){
+      btnRef.current.setAttribute("disabled", "disabled")
+    }
+    var template_params = {
+      'etunimi': formData[0]["etunimi"].text,
+      'sukunimi': formData[1]["sukunimi"].text,
+      'sahkoposti': formData[2]["email"].text,
+      'kaupunki': formData[3]["kaupunki"].text,
+      'sAika': formData[4]["sAika"].text,
+      'joukkueet': formData[5]["joukkueet"].text,
+      'status': formData[6]["status"].text,
+      'liikkuminen': formData[7]["liikkuminen"].text,
+      'hakemusteksti': formData[8]["hakemusteksti"].text
+    }
+
     emailjs.send(process.env.REACT_APP_API_SERVICE, process.env.REACT_APP_API_TEMPLATE, template_params, process.env.REACT_APP_API_USER)
-            .then(function(response) {
-              console.log('Success!', response.status, response.text)
-            }, function(error){
-              console.log('Fail', error)
-              alert(JSON.stringify(error))
-            }) 
-   
-}
+      .then(function (response) {
+        console.log('Success!', response.status, response.text)
+      }, function (error) {
+        console.log('Fail', error)
+        alert(JSON.stringify(error))
+      })
+
+  }
   return (
     <div className="App">
       <header >
@@ -298,17 +301,17 @@ function App() {
                   <div>Current status: {formData[6]["status"].text}</div>
                   <div>Transportation: {formData[7]["liikkuminen"].text}</div>
                   <div>Application letter: {formData[8]["hakemusteksti"].text}</div>
-{/*                   <ReCAPTCHA
+                  {/*                   <ReCAPTCHA
                     sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
                     onChange={captcha}></ReCAPTCHA> */}
                 </DialogContentText>
 
               </DialogContent>
               <DialogActions>
-                <Button onClick={dialogClose} color="inherit">
+                <Button onClick={dialogClose} color="secondary">
                   Go back
           </Button>
-                <Button onClick={handleSubmit} color="inherit">
+                <Button ref={btnRef} onClick={handleSubmit} color="inherit">
                   Submit
           </Button>
               </DialogActions>
