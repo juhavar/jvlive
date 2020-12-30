@@ -33,6 +33,7 @@ function App() {
 
   const [errorCheck, setErrorCheck] = useState(false)
   const [hasStarted, setHasStarted] = useState(false)
+  const [capValue, setCapValue] = useState()
 
 
   const statusOptions = [
@@ -103,9 +104,8 @@ function App() {
 
 
 
-
-
   const handleSubmit = () => {
+
     var template_params= {
         'etunimi': formData[0]["etunimi"].text,
         'sukunimi': formData[1]["sukunimi"].text,
@@ -298,8 +298,9 @@ function App() {
                   <div>Current status: {formData[6]["status"].text}</div>
                   <div>Transportation: {formData[7]["liikkuminen"].text}</div>
                   <div>Application letter: {formData[8]["hakemusteksti"].text}</div>
-                  <ReCAPTCHA
-                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}></ReCAPTCHA>
+{/*                   <ReCAPTCHA
+                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                    onChange={captcha}></ReCAPTCHA> */}
                 </DialogContentText>
 
               </DialogContent>
