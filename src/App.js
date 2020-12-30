@@ -16,7 +16,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 //import{ EmailJSResponseStatus, init } from 'emailjs-com';
 import emailjs from 'emailjs-com';
-import axios from 'axios';
+import ReCAPTCHA from "react-google-recaptcha";;
 
 function App() {
   const [formData, setFormData] = useState([
@@ -38,6 +38,7 @@ function App() {
   const statusOptions = [
     { title: 'Student ' },
     { title: 'Unemployed ' },
+    { title: 'Entrepreneur '},
     { title: 'Employed, part-time ' },
     { title: 'Employed, full-time ' },
     { title: 'In military service, until: ' },
@@ -59,13 +60,11 @@ function App() {
     let deepCopy = JSON.parse(JSON.stringify(formData))
 
     if (e.target.value === "") {
-      console.log("virhe!")
       deepCopy[e.target.id].[e.target.name].error = true
       setFormData(deepCopy)
     }
     else {
 
-      console.log("deepCopy: ", deepCopy)
       deepCopy[e.target.id].[e.target.name].text = e.target.value
       deepCopy[e.target.id].[e.target.name].error = false
 
@@ -102,6 +101,10 @@ function App() {
       setErrorCheck(false)
   }
 
+
+
+
+
   const handleSubmit = () => {
     var template_params= {
         'etunimi': formData[0]["etunimi"].text,
@@ -114,34 +117,16 @@ function App() {
         'liikkuminen': formData[7]["liikkuminen"].text,
         'hakemusteksti': formData[8]["hakemusteksti"].text
       }
-    
-    
-    template_params= JSON.stringify(template_params)
-    console.log("stringified data",template_params)
-    axios
-      .post('https://api.emailjs.com/api/v1.0/email/send', {
-        
-        service_id: process.env.REACT_APP_API_SERVICE,
-        template_id: process.env.REACT_APP_API_TEMPLATE,
-        user_id: process.env.REACT_APP_API_USER,
-        template_params
-        
-      })
-      .then(function(response) {
-        alert(response)})
-        .catch (function (error){
-          alert(error)
-        })
-
-    /* emailjs.send(service_id, template_id, template_params, user_id)
+ 
+    emailjs.send(process.env.REACT_APP_API_SERVICE, process.env.REACT_APP_API_TEMPLATE, template_params, process.env.REACT_APP_API_USER)
             .then(function(response) {
               console.log('Success!', response.status, response.text)
             }, function(error){
               console.log('Fail', error)
               alert(JSON.stringify(error))
             }) 
-  } */
-  }
+   
+}
   return (
     <div className="App">
       <header >
@@ -313,6 +298,8 @@ function App() {
                   <div>Current status: {formData[6]["status"].text}</div>
                   <div>Transportation: {formData[7]["liikkuminen"].text}</div>
                   <div>Application letter: {formData[8]["hakemusteksti"].text}</div>
+                  <ReCAPTCHA
+                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}></ReCAPTCHA>
                 </DialogContentText>
 
               </DialogContent>
