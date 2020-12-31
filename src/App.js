@@ -15,8 +15,11 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 //import{ EmailJSResponseStatus, init } from 'emailjs-com';
+
+import ReCAPTCHA from "react-google-recaptcha";
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Fade from '@material-ui/core/Fade';
 import emailjs from 'emailjs-com';
-//import ReCAPTCHA from "react-google-recaptcha";;
 
 
 function App() {
@@ -34,7 +37,14 @@ function App() {
 
   const [errorCheck, setErrorCheck] = useState(false)
   const [hasStarted, setHasStarted] = useState(false)
+  const [reCaptchaCleared, setReCaptchaCleared] = useState(false)
+  const [sendingState, setSendingState] = useState(false)
+  const [circularType, setCircularType] = useState("indeterminate")
   const btnRef = useRef()
+  const circuRef = useRef()
+
+
+
 
   const statusOptions = [
     { title: 'Student ' },
@@ -96,19 +106,24 @@ function App() {
   const checkForErrors = () => {
 
     let pötkö = JSON.stringify(formData)
-    if (pötkö.includes("true"))
+    if (pötkö.includes(true))
       setErrorCheck(true)
     else
       setErrorCheck(false)
   }
 
-
+  const reCaptcha = () => {
+    setReCaptchaCleared(true)
+  }
 
   const handleSubmit = e => {
-
-    if(btnRef.current){
+    setSendingState(true)
+    if (btnRef.current) {
       btnRef.current.setAttribute("disabled", "disabled")
     }
+
+
+
     var template_params = {
       'etunimi': formData[0]["etunimi"].text,
       'sukunimi': formData[1]["sukunimi"].text,
@@ -121,13 +136,17 @@ function App() {
       'hakemusteksti': formData[8]["hakemusteksti"].text
     }
 
-    emailjs.send(process.env.REACT_APP_API_SERVICE, process.env.REACT_APP_API_TEMPLATE, template_params, process.env.REACT_APP_API_USER)
+    emailjs.send("default_service", process.env.REACT_APP_API_TEMPLATE, template_params, process.env.REACT_APP_API_USER)
       .then(function (response) {
-        console.log('Success!', response.status, response.text)
+        setCircularType("determinate")
+        alert("Application sent successfully. You can now close this window.")
       }, function (error) {
-        console.log('Fail', error)
-        alert(JSON.stringify(error))
+        
+        setCircularType("determinate")
+        alert("Error, please try again later. If the problem persists, please copy and paste the application form and send it manually to jvlive [at] gmx.com ")
       })
+
+
 
   }
   return (
@@ -298,22 +317,44 @@ function App() {
                   <div>City: {formData[3]["kaupunki"].text}</div>
                   <div>Date of birth: {formData[4]["sAika"].text}</div>
                   <div>Nearby teams: {formData[5]["joukkueet"].text}</div>
-                  <div>Current status: {formData[6]["status"].text}</div>
+                  <div>Occupation: {formData[6]["status"].text}</div>
                   <div>Transportation: {formData[7]["liikkuminen"].text}</div>
                   <div>Application letter: {formData[8]["hakemusteksti"].text}</div>
-                  {/*                   <ReCAPTCHA
-                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
-                    onChange={captcha}></ReCAPTCHA> */}
-                </DialogContentText>
 
+                </DialogContentText>
+                <div className="ReCAPTCHA">
+                  {<ReCAPTCHA
+                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                    onChange={reCaptcha}></ReCAPTCHA>}</div>
+                <div className="sending">
+                  <Fade
+                    in={sendingState}
+                    style={{
+                      transitionDelay: sendingState ? '100ms' : '0ms',
+                    }}
+                    unmountOnExit
+                  >
+                    <CircularProgress
+                      variant={circularType}
+                      value={100}
+                    />
+                  </Fade>
+
+                </div>
               </DialogContent>
               <DialogActions>
                 <Button onClick={dialogClose} color="secondary">
                   Go back
           </Button>
-                <Button ref={btnRef} onClick={handleSubmit} color="inherit">
-                  Submit
-          </Button>
+                <Button
+                  ref={btnRef}
+                  onClick={handleSubmit}
+                  color="inherit"
+                  disabled={!reCaptchaCleared}>
+                  {sendingState ? 'Sending' : 'Send'}
+
+                </Button>
+
               </DialogActions>
             </Dialog>
           </div>
