@@ -155,7 +155,7 @@ function App() {
 
       </header>
 
-      <form className="form" preventDefault>
+      <form className="form" preventDefault autoComplete="off">
         <Paper style={{ width: '80%' }}
           variant="outlined" elevation={3} >
           <div><img src={logo} className="App-logo" alt="logo" /></div>
@@ -168,7 +168,7 @@ function App() {
               id="0"
               variant="outlined"
               label="First name"
-
+              
               error={formData[0].["etunimi"].error && errorCheck}
             >
             </TextField></div>
