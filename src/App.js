@@ -26,7 +26,7 @@ function App() {
   const [formData, setFormData] = useState([
     { etunimi: { text: '', error: true } },
     { sukunimi: { text: '', error: true } },
-    { email: { text: '', error: true } },
+    { posti: { text: '', error: true } },
     { kaupunki: { text: '', error: true } },
     { sAika: { text: '', error: true } },
     { joukkueet: { text: '', error: true } },
@@ -127,7 +127,7 @@ function App() {
     var template_params = {
       'etunimi': formData[0]["etunimi"].text,
       'sukunimi': formData[1]["sukunimi"].text,
-      'sahkoposti': formData[2]["email"].text,
+      'sahkoposti': formData[2]["posti"].text,
       'kaupunki': formData[3]["kaupunki"].text,
       'sAika': formData[4]["sAika"].text,
       'joukkueet': formData[5]["joukkueet"].text,
@@ -187,15 +187,15 @@ function App() {
 
           <div className="form-item">
             <TextField
-              name="email"
+              name="posti"
               onBlur={(e) => updateForm(e)}
               style={{ width: '75%' }}
               required={true}
               id="2"
               variant="outlined"
               label="Email address"
-              type="email"
-              error={formData[2].["email"].error && errorCheck}
+              type="posti"
+              error={formData[2].["posti"].error && errorCheck}
             >
             </TextField></div>
 
@@ -313,7 +313,7 @@ function App() {
                 <DialogContentText>
                   <div>First name: {formData[0]["etunimi"].text} </div>
                   <div>Last name: {formData[1]["sukunimi"].text}</div>
-                  <div>Email address: {formData[2]["email"].text}</div>
+                  <div>Email address: {formData[2]["posti"].text}</div>
                   <div>City: {formData[3]["kaupunki"].text}</div>
                   <div>Date of birth: {formData[4]["sAika"].text}</div>
                   <div>Nearby teams: {formData[5]["joukkueet"].text}</div>
