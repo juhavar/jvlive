@@ -16,33 +16,26 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 //import{ EmailJSResponseStatus, init } from 'emailjs-com';
 
-import ReCAPTCHA from "react-google-recaptcha";
+//import ReCAPTCHA from "react-google-recaptcha";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Fade from '@material-ui/core/Fade';
-import emailjs from 'emailjs-com';
 
+import useForm from './Hooks/useForm';
 
 function App() {
-  const [formData, setFormData] = useState([
-    { etunimi: { text: '', error: true } },
-    { sukunimi: { text: '', error: true } },
-    { posti: { text: '', error: true } },
-    { kaupunki: { text: '', error: true } },
-    { sAika: { text: '', error: true } },
-    { joukkueet: { text: '', error: true } },
-    { status: { text: '', error: true } },
-    { liikkuminen: { text: '', error: true } },
-    { hakemusteksti: { text: '', error: true } }]
-  )
+
 
   const [errorCheck, setErrorCheck] = useState(false)
   const [hasStarted, setHasStarted] = useState(false)
-  const [reCaptchaCleared, setReCaptchaCleared] = useState(false)
+  //const [reCaptchaCleared, setReCaptchaCleared] = useState(false)
   const [sendingState, setSendingState] = useState(false)
   const [circularType, setCircularType] = useState("indeterminate")
+  const [success, setSuccess] = useState(false)
+  const [formDone, setFormDone] = useState()
   const btnRef = useRef()
   const circuRef = useRef()
-
+  //Custom hook call
+  const {handleChange, values, errors, handleSubmit } = useForm();
 
 
 
@@ -53,44 +46,17 @@ function App() {
     { title: 'Employed, part-time ' },
     { title: 'Employed, full-time ' },
     { title: 'In military service, until: ' },
-    { title: 'Other, please specify: ' }
-
-  ]
+    { title: 'Other, please specify: ' }]
 
   const transportOptions = [
     { title: "Car" },
     { title: 'Public transportation (bus/train)' },
-    { title: 'Walking, cycling' }
-
-  ]
+    { title: 'Walking, cycling' } ]
 
   const [open, setOpen] = useState(false);
 
-  const updateForm = (e) => {
-    setHasStarted(true)
-    let deepCopy = JSON.parse(JSON.stringify(formData))
-
-    if (e.target.value === "") {
-      deepCopy[e.target.id].[e.target.name].error = true
-      setFormData(deepCopy)
-    }
-    else {
-
-      deepCopy[e.target.id].[e.target.name].text = e.target.value
-      deepCopy[e.target.id].[e.target.name].error = false
-
-      setFormData(deepCopy)
-      //setFormData(formData[e.target.name]: e.target.value)
-      // setFormData([e.target.name].error = false)
-
-    }
-  }
-
-
-
   const dialogOpen = () => {
-    if (!errorCheck && hasStarted)
-      setOpen(true)
+    setOpen(true);
   }
 
   const dialogClose = () => {
@@ -98,124 +64,100 @@ function App() {
   }
 
   const continueButtonClick = () => {
-
-    checkForErrors()
-    dialogOpen()
-  }
-
-  const checkForErrors = () => {
-
-    let pötkö = JSON.stringify(formData)
-    if (pötkö.includes(true))
-      setErrorCheck(true)
-    else
-      setErrorCheck(false)
-  }
-
-  const reCaptcha = () => {
-    setReCaptchaCleared(true)
-  }
-
-  const handleSubmit = e => {
-    setSendingState(true)
-    if (btnRef.current) {
-      btnRef.current.setAttribute("disabled", "disabled")
+    if(Object.keys(errors).length === 0 && Object.keys(values).length === 9) {
+      dialogOpen()
+    
     }
-
-
-
-    var template_params = {
-      'etunimi': formData[0]["etunimi"].text,
-      'sukunimi': formData[1]["sukunimi"].text,
-      'sahkoposti': formData[2]["posti"].text,
-      'kaupunki': formData[3]["kaupunki"].text,
-      'sAika': formData[4]["sAika"].text,
-      'joukkueet': formData[5]["joukkueet"].text,
-      'status': formData[6]["status"].text,
-      'liikkuminen': formData[7]["liikkuminen"].text,
-      'hakemusteksti': formData[8]["hakemusteksti"].text
-    }
-
-    emailjs.send("default_service", process.env.REACT_APP_API_TEMPLATE, template_params, process.env.REACT_APP_API_USER)
-      .then(function (response) {
-        setCircularType("determinate")
-        alert("Application sent successfully. You can now close this window.")
-      }, function (error) {
-        
-        setCircularType("determinate")
-        alert("Error, please try again later. If the problem persists, please copy and paste the application form and send it manually to jvlive [at] gmx.com ")
-      })
-
-
-
+    
   }
+
+  
+
+  // const reCaptcha = () => {
+  //   setReCaptchaCleared(true)
+  // }
+
+  // const handleSubmit = e => {
+  //   setSendingState(true)
+  //   if (btnRef.current) {
+  //     btnRef.current.setAttribute("disabled", "disabled")
+  //   }
+
+  // }
   return (
     <div className="App">
       <header >
 
       </header>
 
-      <form className="form" preventDefault autoComplete="off">
+      <form className="form" autoComplete="off">
         <Paper style={{ width: '80%' }}
           variant="outlined" elevation={3} >
           <div><img src={logo} className="App-logo" alt="logo" /></div>
           <div className="form-item">
             <TextField
               name="etunimi"
-              onBlur={(e) => updateForm(e)}
+              onBlur={(e) => handleChange(e)}
               style={{ width: '75%' }}
               required
               id="0"
               variant="outlined"
               label="First name"
-
-              error={formData[0].["etunimi"].error && errorCheck}
+              // onChange={handleChange}
+              error={errors.etunimi}
+              helperText={errors.etunimi}
             >
             </TextField></div>
 
           <div className="form-item">
             <TextField
               name="sukunimi"
-              onBlur={(e) => updateForm(e)}
+              onBlur={(e) => handleChange(e)}
               style={{ width: '75%' }}
               required
               id="1"
               variant="outlined"
               label="Last name"
-              error={formData[1].["sukunimi"].error && errorCheck}>
+              // onChange={handleChange}
+              error={errors.sukunimi}
+              helperText={errors.sukunimi}>
             </TextField></div>
 
           <div className="form-item">
             <TextField
               name="posti"
-              onBlur={(e) => updateForm(e)}
+              onBlur={(e) => handleChange(e)}
               style={{ width: '75%' }}
               required={true}
               id="2"
               variant="outlined"
               label="Email address"
               type="posti"
-              error={formData[2].["posti"].error && errorCheck}
+              // onChange={handleChange}
+              error={errors.posti}
+              helperText={errors.posti}
             >
             </TextField></div>
 
           <div className="form-item">
             <TextField
               name="kaupunki"
-              onBlur={(e) => updateForm(e)}
+              onBlur={(e) => handleChange(e)}
               style={{ width: '75%' }}
               required
               id="3"
               variant="outlined"
               label="City of residence"
-              error={formData[3].["kaupunki"].error && errorCheck}
+              // onChange={handleChange}
+              error={errors.kaupunki}
+              helperText={errors.kaupunki}
             >
             </TextField></div>
 
           <div className="form-item">
             <TextField
               name="sAika"
-              onBlur={(e) => updateForm(e)}
+              onBlur={(e) => handleChange(e)}
               style={{ width: '75%' }}
               required
               id="4"
@@ -223,24 +165,26 @@ function App() {
               label="Date of birth"
               //defaultValue="01-01-2000"
               helperText="Please use format (DD-MM-YYYY)"
-              error={formData[4].["sAika"].error && errorCheck}
+              // onChange={handleChange}
+              error={errors.sAika}
+              helperText={errors.sAika}
             >
             </TextField></div>
-
-
-
 
           <div className="form-item">
             <TextField
               name="joukkueet"
-              onBlur={(e) => updateForm(e)}
+              onBlur={(e) => handleChange(e)}
               style={{ width: '75%' }}
               required
               id="5"
               variant="outlined"
               label="Nearby teams"
-              helperText="You can type as many as you like"
-              error={formData[5].["joukkueet"].error && errorCheck}>
+              placeholder="You can type as many as you like"
+              // onChange={handleChange}
+              error={errors.joukkueet}
+              helperText={errors.joukkueet}
+              >
             </TextField></div>
 
           <div className="form-item">
@@ -252,20 +196,22 @@ function App() {
                 <TextField
                   name="status"
                   id="6"
-                  onBlur={(e) => updateForm(e)}
+                  onBlur={(e) => handleChange(e)}
                   style={{ width: '75%' }}
                   {...params}
                   label="Current occupation"
                   variant="outlined"
-                  helperText="Type or select the most relevant option from the drop-down menu. You can also specify additional information such as your weekly working hours"
+                  placeholder="Type or select the most relevant option from the drop-down menu. You can also specify additional information such as your weekly working hours"
                   required
-                  error={formData[6].["status"].error && errorCheck}
+                  // onChange={handleChange}
+                  error={errors.status}
+                  helperText={errors.status}
                 ></TextField>}
             /></div>
 
           <div className="form-item">
             <Autocomplete
-              onBlur={(e) => updateForm(e)}
+              onBlur={(e) => handleChange(e)}
               id="7"
               options={transportOptions}
               getOptionLabel={(option => option.title)}
@@ -278,14 +224,16 @@ function App() {
                   label="Primary means of transportation"
                   variant="outlined"
                   required
-                  error={formData[7]["liikkuminen"].error && errorCheck}
+                  // onChange={handleChange}
+                  error={errors.liikkuminen}
+                  helperText={errors.liikkuminen}
                 ></TextField>}
             /></div>
           <div className="form-item">
             <TextField
               color='primary'
               name="hakemusteksti"
-              onBlur={(e) => updateForm(e)}
+              onBlur={(e) => handleChange(e)}
               style={{ width: '75%' }}
               required={true}
               id="8"
@@ -295,7 +243,8 @@ function App() {
               rows={10}
               helperText="Please write a few lines about yourself and your expectations for the job, what motivated you to apply and how this job would fit into your current short
               to medium term plans."
-              error={formData[8].["hakemusteksti"].error && errorCheck}
+              // onChange={handleChange}
+              error={errors.hakemusteksti}
             >
             </TextField></div>
           <div className="form-item">
@@ -308,24 +257,21 @@ function App() {
               Continue
         </Button>
             <Dialog open={open} onClose={dialogClose} aria-labelledby="form-dialog-title">
-              <DialogTitle id="form-dialog-title">Is this correct?</DialogTitle>
+              <DialogTitle id="form-dialog-title">{{success} ? 'Is this correct?' : {formDone}} </DialogTitle>
               <DialogContent >
                 <DialogContentText>
-                  <div>First name: {formData[0]["etunimi"].text} </div>
-                  <div>Last name: {formData[1]["sukunimi"].text}</div>
-                  <div>Email address: {formData[2]["posti"].text}</div>
-                  <div>City: {formData[3]["kaupunki"].text}</div>
-                  <div>Date of birth: {formData[4]["sAika"].text}</div>
-                  <div>Nearby teams: {formData[5]["joukkueet"].text}</div>
-                  <div>Occupation: {formData[6]["status"].text}</div>
-                  <div>Transportation: {formData[7]["liikkuminen"].text}</div>
-                  <div>Application letter: {formData[8]["hakemusteksti"].text}</div>
+                  <div>First name: {values.etunimi} </div>
+                  <div>Last name: {values.sukunimi}</div>
+                  <div>Email address: {values.posti}</div>
+                  <div>City: {values.kaupunki}</div>
+                  <div>Date of birth: {values.sAika}</div>
+                  <div>Nearby teams: {values.joukkueet}</div>
+                  <div>Occupation: {values.status}</div>
+                  <div>Transportation: {values.liikkuminen}</div>
+                  <div>Application letter: {values.hakemusteksti}</div>
 
                 </DialogContentText>
-                <div className="ReCAPTCHA">
-                  {<ReCAPTCHA
-                    sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
-                    onChange={reCaptcha}></ReCAPTCHA>}</div>
+                
                 <div className="sending">
                   <Fade
                     in={sendingState}
@@ -334,10 +280,11 @@ function App() {
                     }}
                     unmountOnExit
                   >
+                    {sendingState &&
                     <CircularProgress
                       variant={circularType}
                       value={100}
-                    />
+                    />}
                   </Fade>
 
                 </div>
@@ -345,12 +292,28 @@ function App() {
               <DialogActions>
                 <Button onClick={dialogClose} color="secondary">
                   Go back
-          </Button>
+                </Button>
                 <Button
                   ref={btnRef}
-                  onClick={handleSubmit}
+                  onClick={() => {
+                    setSendingState(true);
+                    var result = handleSubmit();
+                    
+                    if (result){
+                      setSuccess(true)
+                      setCircularType("determinate")
+                      setFormDone("Following data was sent succesfully:")
+                    }
+                    else{
+                      setCircularType("determinate")
+                      
+                    }
+                    
+
+                  }}
                   color="inherit"
-                  disabled={!reCaptchaCleared}>
+                  disabled={sendingState || success} 
+                  >
                   {sendingState ? 'Sending' : 'Send'}
 
                 </Button>
